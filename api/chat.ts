@@ -1,34 +1,42 @@
 import { openai } from '@ai-sdk/openai';
-import { streamText } from 'ai';
+import { textCompletion } from 'ai';
 
 export async function POST(req: Request) {
-  const { messages, imageUrl } = await req.json();
+  try {
+    // Parse the request body
+    const body = await req.json();
 
-  console.log('imageUrl', imageUrl);
+    // Extract messages from the request
+    const { messages } = body;
 
-  // Add the image to the messages if it exists
-  const messagesWithImage = imageUrl
-    ? [
-        ...messages,
-        {
-          role: 'user',
-          content: [
-            { type: 'text', text: 'Is this a pizza?' },
-            { type: 'image', image: imageUrl },
-          ],
-        },
-      ]
-    : messages;
+    console.log('Received messages:', JSON.stringify(messages).slice(0, 200) + '...');
 
-  const result = streamText({
-    model: openai('gpt-4o'),
-    messages: messagesWithImage,
-  });
+    // Validate the messages
+    if (!messages || !Array.isArray(messages)) {
+      return new Response(
+          JSON.stringify({ error: 'Invalid request: messages must be an array' }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
 
-  return result.toDataStreamResponse({
-    headers: {
-      'Content-Type': 'application/octet-stream',
-      'Content-Encoding': 'none',
-    },
-  });
+    // Get the complete response using the AI SDK (non-streaming)
+    const result = await textCompletion({
+      model: openai('gpt-4o'),
+      messages: messages,
+    });
+
+    console.log('Completed response:', result.slice(0, 100) + '...');
+
+    // Return the complete response
+    return new Response(
+        JSON.stringify({ response: result }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+    );
+  } catch (error) {
+    console.error('Error in chat API:', error);
+    return new Response(
+        JSON.stringify({ error: 'Internal server error', message: error.message }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
 }

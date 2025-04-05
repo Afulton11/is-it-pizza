@@ -21,7 +21,7 @@ export function ImagePicker({ onImageSelected, isLoading }: ImagePickerProps) {
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
       const selectedImage = result.assets[0].base64!;
-      console.log('selectedImageBase64', selectedImage);
+      console.log('selectedImageBase64');
       setImage(selectedImage);
       onImageSelected(selectedImage);
     }

@@ -16,16 +16,15 @@ export function PizzaDetector() {
   });
 
   const handleImageSelected = async (uri: string) => {
+    console.log('image uri', uri);
     setImageUrl(uri);
-    await append(
-      {
-        role: 'user',
-        content: 'Analyze this image and tell me if it is a pizza or not.',
-      },
-      {
-        data: { imageUrl: uri },
-      }
-    );
+    await append({
+      role: 'user',
+      content: [
+        { type: 'text', text: 'Analyze this image and tell me if it is a pizza or not.' },
+        { type: 'image', image: uri },
+      ],
+    });
   };
 
   return (

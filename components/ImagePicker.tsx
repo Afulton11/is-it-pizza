@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { View, Image, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 
 interface ImagePickerProps {
-  onImageSelected: (uri: string) => void;
+  onImageSelected: (base64: string) => void;
   isLoading: boolean;
 }
 
@@ -16,10 +16,12 @@ export function ImagePicker({ onImageSelected, isLoading }: ImagePickerProps) {
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
+      base64: true,
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
-      const selectedImage = result.assets[0].uri;
+      const selectedImage = result.assets[0].base64!;
+      console.log('selectedImageBase64', selectedImage);
       setImage(selectedImage);
       onImageSelected(selectedImage);
     }

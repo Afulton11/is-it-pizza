@@ -4,6 +4,8 @@ import { streamText } from 'ai';
 export async function POST(req: Request) {
   const { messages, imageUrl } = await req.json();
 
+  console.log('imageUrl', imageUrl);
+
   // Add the image to the messages if it exists
   const messagesWithImage = imageUrl
     ? [
@@ -12,7 +14,7 @@ export async function POST(req: Request) {
           role: 'user',
           content: [
             { type: 'text', text: 'Is this a pizza?' },
-            { type: 'image_url', image_url: { url: imageUrl } },
+            { type: 'image', image: imageUrl },
           ],
         },
       ]
